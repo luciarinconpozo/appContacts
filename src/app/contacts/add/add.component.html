@@ -1,0 +1,18 @@
+<!-- Formulario dinámico para Añadir/Editar Contactos -->
+<div class="max-w-2xl mx-auto mt-10 bg-white p-6 rounded shadow">
+    <h2 class="text-xl font-bold mb-4">Gestión de Contactos</h2>
+    <form>
+        <div id="contactos">
+            <!-- Aquí se generarán los campos dinámicos -->
+            <div class="contacto mb-4 p-4 border rounded">
+                <input type="text" placeholder="Nombre" class="w-full border p-2 mb-2 rounded">
+                <input type="email" placeholder="Correo electrónico" class="w-full border p-2 mb-2 rounded">
+                <input type="tel" placeholder="Teléfono" class="w-full border p-2 mb-2 rounded">
+                <input type="text" placeholder="Dirección" class="w-full border p-2 mb-2 rounded">
+                <button class="bg-red-600 text-white px-3 py-1 rounded">Eliminar</button>
+            </div>
+        </div>
+        <button id="agregarContacto" class="w-full bg-green-600 text-white p-2 rounded mt-2">Añadir Contacto</button>
+        <button class="w-full bg-blue-600 text-white p-2 rounded mt-2">Guardar Contactos</button>
+    </form>
+  </div>
