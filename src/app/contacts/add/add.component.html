@@ -1,18 +1,29 @@
-<!-- Formulario dinámico para Añadir/Editar Contactos -->
+@if(userId) {
+
 <div class="max-w-2xl mx-auto mt-10 bg-white p-6 rounded shadow">
     <h2 class="text-xl font-bold mb-4">Gestión de Contactos</h2>
-    <form>
-        <div id="contactos">
-            <!-- Aquí se generarán los campos dinámicos -->
-            <div class="contacto mb-4 p-4 border rounded">
-                <input type="text" placeholder="Nombre" class="w-full border p-2 mb-2 rounded">
-                <input type="email" placeholder="Correo electrónico" class="w-full border p-2 mb-2 rounded">
-                <input type="tel" placeholder="Teléfono" class="w-full border p-2 mb-2 rounded">
-                <input type="text" placeholder="Dirección" class="w-full border p-2 mb-2 rounded">
-                <button class="bg-red-600 text-white px-3 py-1 rounded">Eliminar</button>
-            </div>
+
+    <form [formGroup]="contactForm" (ngSubmit)="saveContacts()">
+        <div formArrayName="contacts">
+            @for (contact of contacts.controls; track $index) {
+                <div [formGroupName]="$index"
+                    class="mb-4 p-4 border rounded">
+                    <input type="text" placeholder="Nombre" formControlName="nombre" class="w-full border p-2 mb-2 rounded">
+                    <input type="email" placeholder="Correo electrónico" formControlName="email"
+                        class="w-full border p-2 mb-2 rounded">
+                    <input type="tel" placeholder="Teléfono" formControlName="telefono"
+                        class="w-full border p-2 mb-2 rounded">
+                    <input type="text" placeholder="Dirección" formControlName="direccion"
+                        class="w-full border p-2 mb-2 rounded">
+                    <button type="button" class="bg-red-600 text-white px-3 py-1 rounded"
+                        (click)="removeContact($index)">Eliminar</button>
+                </div>
+            }
         </div>
-        <button id="agregarContacto" class="w-full bg-green-600 text-white p-2 rounded mt-2">Añadir Contacto</button>
-        <button class="w-full bg-blue-600 text-white p-2 rounded mt-2">Guardar Contactos</button>
+
+        <button type="button" class="w-full bg-green-600 text-white p-2 rounded mt-2" (click)="addContact()">Añadir
+            Contacto</button>
+        <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded mt-2">Guardar Contactos</button>
     </form>
-  </div>
+</div>
+}

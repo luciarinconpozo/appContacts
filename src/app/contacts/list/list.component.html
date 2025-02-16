@@ -3,14 +3,16 @@
 <div class="max-w-2xl mx-auto mt-10 bg-white p-6 rounded shadow">
     <h2 class="text-xl font-bold mb-4">Mis Contactos</h2>
     <ul>
-        <li class="flex justify-between items-center border-b p-2">
-            <span>Juan Pérez - juan&#64;example.com</span>
-            <button class="bg-red-600 text-white px-3 py-1 rounded">Eliminar</button>
-        </li>
-        <li class="flex justify-between items-center border-b p-2">
-            <span>María Gómez - maria&#64;example.com</span>
-            <button class="bg-red-600 text-white px-3 py-1 rounded">Eliminar</button>
-        </li>
+        @for (contact of contactsService.contacts(); track contact.id) {
+
+            <li class="flex justify-between items-center border-b p-2">
+                <span>{{contact.nombre}} - {{contact.email}}</span>
+                <button class="bg-red-600 text-white px-3 py-1 rounded" (click)="removeContact(contact.id)">Eliminar</button>
+            </li>
+        }
+        @empty {
+            <h1>No tienes contactos todavía</h1>
+        }
     </ul>
   </div>
 
