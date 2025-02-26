@@ -38,4 +38,10 @@
             Registrarse
         </button>
     </form>
+
+    <pre>
+        <p> Errores del formulario: {{registerForm.errors|json}} </p>
+        <p> Errores del campo confirmPassword: {{registerForm.get('confirmPassword')?.errors|json}}</p>
+        
+    </pre>
 </div>

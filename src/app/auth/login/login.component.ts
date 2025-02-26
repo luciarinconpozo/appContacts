@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, Input, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms'
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
@@ -16,11 +16,12 @@ export class LoginComponent {
   private router: Router = inject(Router);
   @ViewChild('myForm') myForm!: NgForm;
 
-
   submit() {
+    
     this.authService.login(this.myForm.value.email, this.myForm.value.password)
       .subscribe({
         next: response => {
+          
           Swal.fire({
             title: "Login correcto",
             text: "Has iniciado sesión",
@@ -36,7 +37,8 @@ export class LoginComponent {
           title: 'Error!',
           text: "Credenciales incorrectas",
           icon: 'error',
-          confirmButtonText: 'Aceptar'
+          confirmButtonText: 'Aceptar',
+
         })
       })
   }

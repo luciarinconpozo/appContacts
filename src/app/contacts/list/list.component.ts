@@ -13,6 +13,7 @@ export class ListComponent implements OnInit {
   contactsService: ContactsService = inject(ContactsService);
 
   ngOnInit(): void {
+    console.log('Componente list')
     this.contactsService.getContacts();
   }
 

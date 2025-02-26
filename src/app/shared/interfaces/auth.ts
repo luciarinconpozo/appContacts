@@ -1,6 +1,6 @@
 export interface loginResponse{
     message: string;
-    userId: string;
+    token: string;
 }
 
 export interface RegisterResponse{

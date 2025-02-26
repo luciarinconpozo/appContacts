@@ -13,11 +13,14 @@ export class ValidateEmailService implements AsyncValidator{
 
   validate(control: AbstractControl): Observable<ValidationErrors | null> {
     const email = control.value;
+    console.log('Validación asíncrona')
     
     
     return this.http.get<CheckEmailResponse>(`http://localhost:3000/api/auth/check-email/${email}`)
     .pipe(
+      delay(3000),
       map( resp => {
+        console.log('Petición hecha')
         return (resp.exists) ? { emailTaken: true} : null 
       })
 

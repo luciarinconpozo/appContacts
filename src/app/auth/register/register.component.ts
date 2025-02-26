@@ -1,4 +1,4 @@
-import { NgClass, NgIf } from '@angular/common';
+import { JsonPipe, NgClass, NgIf } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { AbstractControl, Form, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
@@ -8,7 +8,7 @@ import { ValidateEmailService } from '../services/validate-email.service';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, NgIf, NgClass],
+  imports: [ReactiveFormsModule, NgIf, NgClass, JsonPipe],
   templateUrl: './register.component.html'
 })
 export class RegisterComponent {
@@ -20,28 +20,36 @@ export class RegisterComponent {
 
 
   registerForm: FormGroup = this.fb.group({
-    nombre: ['', Validators.required],
+    nombre: ['', [Validators.required, this.lowerCase]],
     email: ['', [Validators.required, Validators.email], [this.emailValidatorService]],
     password: ['', [Validators.required, Validators.minLength(6)]],
-    confirmPassword: ['', Validators.required]
+    confirmPassword: ['', [Validators.required, Validators.minLength(6)]]
   }, { validators: this.equalFields('password', 'confirmPassword') });
+
+  lowerCase(control: AbstractControl): ValidationErrors | null {
+    let errors = null;
+    if(control.value !== control.value.toLowerCase()){
+      errors = {lowerCaseError: true}
+    }
+    return errors;
+  }
 
 
   equalFields(field1: string, field2: string): ValidatorFn {
     return (form: AbstractControl): ValidationErrors | null => {
       const control1 = form.get(field1);
       const control2 = form.get(field2);
-
+      
       if (control1?.value !== control2?.value) {
         control2?.setErrors({ nonEquals: true });
         return { nonEquals: true };
       }
 
       // Si los valores son iguales, eliminamos el error solo si 'nonEquals' estaba presente antes
-      if (control2?.hasError('nonEquals')) {
-        control2.setErrors(null);
-        control2.updateValueAndValidity({ onlySelf: true });
-      }
+      // if (control2?.hasError('nonEquals')) {
+      //   control2.setErrors(null);
+      //   control2.updateValueAndValidity({ onlySelf: true });
+      // }
 
       return null;
     };
@@ -93,6 +101,9 @@ export class RegisterComponent {
 
         }
       });
+    }
+    else{
+      this.registerForm.markAllAsTouched();
     }
   }
 }

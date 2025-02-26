@@ -4,6 +4,7 @@ import { Observable, tap } from 'rxjs';
 import { loginResponse, RegisterResponse, User } from '../../shared/interfaces/auth';
 import { ContactsService } from '../../contacts/services/contacts.service';
 import { Router } from '@angular/router';
+import {jwtDecode} from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
@@ -25,8 +26,26 @@ export class AuthService {
     }
   }
 
+  getDecodedAccessToken(token: string): any {
+    try {
+      return jwtDecode(token);
+    } catch(Error) {
+      return null;
+    }
+  }
+
   get isLogged() {
     return this.isLoggedSignal.asReadonly();
+  }
+
+  isLoggedF(): boolean{
+    if (this.isLogged()){
+      return true;
+    }
+    else{
+      this.router.navigateByUrl('/login');
+      return false;
+    }
   }
 
   login(email: string, password: string) {
@@ -35,8 +54,11 @@ export class AuthService {
       .pipe(
         tap({
           next: response => {
-            this._userId = response.userId;
-            localStorage.setItem('userId', response.userId);
+            const token = this.getDecodedAccessToken(response.token);
+            console.log('Token:' , token)
+            this._userId = token.userId;
+            localStorage.setItem('userId', token.userId)
+            localStorage.setItem('token', response.token);
             this.isLoggedSignal.set(true);
           }
         })

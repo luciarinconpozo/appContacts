@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { AuthService } from '../../auth/services/auth.service';
 import { Observable, of, tap } from 'rxjs';
@@ -14,6 +14,9 @@ export class ContactsService {
   private userId: string = '';
   private urlBase: string = 'http://localhost:3000/api/contactos';
 
+  
+
+
   private contactsSignal = signal<Contact[]>([]);
 
   constructor(){
@@ -28,9 +31,12 @@ export class ContactsService {
 
   
   getContacts(): void{
+    const token = localStorage.getItem('token') || '';
+    const headers: HttpHeaders = new HttpHeaders()
+    .set('Authorization', `Bearer ${token}`);
     this.userId = this.authService.userId;
     if (this.userId) {
-      this.http.get<Contact[]>(`${this.urlBase}/${this.userId}`)
+      this.http.get<Contact[]>(`${this.urlBase}/${this.userId}`, {headers})
       .subscribe({
         next: contacts => this.contactsSignal.set(contacts),
         error: error => console.log('Error: ', error)
