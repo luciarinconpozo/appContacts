@@ -6,11 +6,12 @@ export const loginGuard: CanMatchFn = (route, segments) => {
   console.log('Guardián')
   const authService: AuthService = inject(AuthService);
   const router: Router = inject(Router);
-  if (authService.isLogged()){
-    return true;
-  }
-  else{
-    router.navigateByUrl('/login');
-    return false;
-  }
+  // if (authService.isLogged()){
+  //   return true;
+  // }
+  // else{
+  //   router.navigateByUrl('/login');
+  //   return false;
+  // }
+  return authService.validateToken()
 };

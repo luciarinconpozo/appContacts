@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { catchError, map, Observable, of, tap } from 'rxjs';
 import { loginResponse, RegisterResponse, User } from '../../shared/interfaces/auth';
 import { ContactsService } from '../../contacts/services/contacts.service';
 import { Router } from '@angular/router';
@@ -34,6 +34,22 @@ export class AuthService {
     }
   }
 
+  validateToken(){
+    const url = `${this.baseUrl}/verify`;
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${localStorage.getItem('token') || ''}`);
+
+      return this.http.get<loginResponse>(url, {headers})
+      .pipe(
+        map( resp => {
+          // Aquí deberíamos guardar la información del usuario
+          return true;
+        }),
+        catchError(err => of(false))
+      )
+
+  }
+
   get isLogged() {
     return this.isLoggedSignal.asReadonly();
   }
@@ -49,7 +65,7 @@ export class AuthService {
   }
 
   login(email: string, password: string) {
-    console.log('Email: ', email, 'Password: ', password)
+    
     return this.http.post<loginResponse>(`${this.baseUrl}/login`, { email, password })
       .pipe(
         tap({

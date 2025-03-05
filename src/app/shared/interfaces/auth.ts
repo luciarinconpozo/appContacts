@@ -16,3 +16,9 @@ export interface User{
 export interface CheckEmailResponse {
     exists: boolean;
 }
+
+export interface Token {
+    exp: number;
+    iat: number;
+    userId: string;
+}
