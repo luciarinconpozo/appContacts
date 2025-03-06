@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { catchError, map, Observable, of, pipe, tap } from 'rxjs';
-import { loginResponse, RegisterResponse, Token, User } from '../../shared/interfaces/auth';
+import { catchError, map, Observable, of, tap } from 'rxjs';
+import { loginResponse, RegisterResponse, User, Token } from '../../shared/interfaces/auth';
 import { ContactsService } from '../../contacts/services/contacts.service';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
@@ -19,13 +19,13 @@ export class AuthService {
   private isLoggedSignal = signal<boolean>(false);
   private router: Router = inject(Router);
 
-  constructor() {
-    let userId = localStorage.getItem('userId');
-    if (userId) {
-      this._userId = userId;
-      this.isLoggedSignal.set(true);
-    }
-    this.validateToken().subscribe(resp => console.log(resp))
+  constructor(){
+    // let userId = localStorage.getItem('userId');
+    // if (userId) {
+    //   this._userId = userId;
+    //   this.isLoggedSignal.set(true);
+    // }
+    this.validateToken().subscribe();
   }
 
   getDecodedAccessToken(token: string): Token | null {
@@ -34,6 +34,29 @@ export class AuthService {
     } catch (Error) {
       return null;
     }
+  }
+
+  validateToken(){
+    const url = `${this.baseUrl}/verify`;
+    const headers = new HttpHeaders()
+      .set('Authorization', `Bearer ${localStorage.getItem('token') || ''}`);
+
+      return this.http.get<loginResponse>(url, {headers})
+      .pipe(
+        map( response => {
+          const token = this.getDecodedAccessToken(response.token);
+            console.log('Token:' , token)
+            if (token) {
+              this._userId = token?.userId;
+              localStorage.setItem('userId', token.userId)
+              localStorage.setItem('token', response.token);
+              this.isLoggedSignal.set(true);
+            }
+          return true;
+        }),
+        catchError(err => of(false))
+      )
+
   }
 
   get isLogged() {
@@ -75,14 +98,15 @@ export class AuthService {
   }
 
   login(email: string, password: string) {
-    console.log('Email: ', email, 'Password: ', password)
+    
     return this.http.post<loginResponse>(`${this.baseUrl}/login`, { email, password })
       .pipe(
         tap({
           next: response => {
             const token = this.getDecodedAccessToken(response.token);
+            console.log('Token:' , token)
             if (token) {
-              this._userId = token.userId;
+              this._userId = token?.userId;
               localStorage.setItem('userId', token.userId)
               localStorage.setItem('token', response.token);
               this.isLoggedSignal.set(true);

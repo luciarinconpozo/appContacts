@@ -16,12 +16,9 @@ export const loginGuard: CanMatchFn = (route, segments) => {
   // }
   return authService.validateToken()
   .pipe(
-    tap( valid => {
-      if (!valid) {
-        router.navigateByUrl('/login')
-      }
+    tap(valid => {
+      console.log('Valid: ', valid)
+      if (!valid) router.navigateByUrl('/login')     
     })
   )
-    
-  
 };

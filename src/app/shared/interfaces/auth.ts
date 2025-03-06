@@ -18,7 +18,7 @@ export interface CheckEmailResponse {
 }
 
 export interface Token {
-    iat: number;
     exp: number;
+    iat: number;
     userId: string;
 }
