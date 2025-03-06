@@ -78,7 +78,8 @@ export class AddComponent {
         this.contactForm.reset();
         this.contacts.clear();
       },
-      error: () => {
+      error: (error) => {
+        console.log(error)
         Swal.fire({
           title: "Error",
           text: "Hubo un problema al guardar los contactos",

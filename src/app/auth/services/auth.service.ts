@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { catchError, map, Observable, of, tap } from 'rxjs';
-import { loginResponse, RegisterResponse, User } from '../../shared/interfaces/auth';
+import { loginResponse, RegisterResponse, User, Token } from '../../shared/interfaces/auth';
 import { ContactsService } from '../../contacts/services/contacts.service';
 import { Router } from '@angular/router';
 import {jwtDecode} from 'jwt-decode';
@@ -19,14 +19,15 @@ export class AuthService {
   private router: Router = inject(Router);
 
   constructor(){
-    let userId = localStorage.getItem('userId');
-    if (userId) {
-      this._userId = userId;
-      this.isLoggedSignal.set(true);
-    }
+    // let userId = localStorage.getItem('userId');
+    // if (userId) {
+    //   this._userId = userId;
+    //   this.isLoggedSignal.set(true);
+    // }
+    this.validateToken().subscribe();
   }
 
-  getDecodedAccessToken(token: string): any {
+  getDecodedAccessToken(token: string): Token | null {
     try {
       return jwtDecode(token);
     } catch(Error) {
@@ -41,8 +42,15 @@ export class AuthService {
 
       return this.http.get<loginResponse>(url, {headers})
       .pipe(
-        map( resp => {
-          // Aquí deberíamos guardar la información del usuario
+        map( response => {
+          const token = this.getDecodedAccessToken(response.token);
+            console.log('Token:' , token)
+            if (token) {
+              this._userId = token?.userId;
+              localStorage.setItem('userId', token.userId)
+              localStorage.setItem('token', response.token);
+              this.isLoggedSignal.set(true);
+            }
           return true;
         }),
         catchError(err => of(false))
@@ -72,10 +80,12 @@ export class AuthService {
           next: response => {
             const token = this.getDecodedAccessToken(response.token);
             console.log('Token:' , token)
-            this._userId = token.userId;
-            localStorage.setItem('userId', token.userId)
-            localStorage.setItem('token', response.token);
-            this.isLoggedSignal.set(true);
+            if (token) {
+              this._userId = token?.userId;
+              localStorage.setItem('userId', token.userId)
+              localStorage.setItem('token', response.token);
+              this.isLoggedSignal.set(true);
+            }
           }
         })
       )
@@ -92,6 +102,7 @@ export class AuthService {
 
   logOut(){
     localStorage.removeItem('userId');
+    localStorage.removeItem('token');
     this._userId = '';
     this.isLoggedSignal.set(false);
     this.router.navigateByUrl('/login')
