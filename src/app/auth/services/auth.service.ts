@@ -84,18 +84,6 @@ export class AuthService {
             }
   }
 
-  validateToken() {
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('token') || ''}`)
-    // ESTO NO ES EQUIVALENTE YA QUE SET DEVUELVE UNA CABECERA NUEVA NO MODIFICA 
-    // const header = new HttpHeaders()
-    // header.set('Authorization', `Bearer ${localStorage.getItem('token') || ''}`)
-    return this.http.get<loginResponse>(`${this.baseUrl}/verify`, { headers })
-      .pipe(
-        map(resp => {
-          this.setUserSession(resp.token);
-        })
-      );
-  }
 
   login(email: string, password: string) {
     
