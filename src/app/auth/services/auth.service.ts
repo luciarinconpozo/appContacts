@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { catchError, map, Observable, of, pipe, tap } from 'rxjs';
 import { loginResponse, RegisterResponse, Token, User } from '../../shared/interfaces/auth';
 import { ContactsService } from '../../contacts/services/contacts.service';
 import { Router } from '@angular/router';
@@ -56,6 +56,14 @@ export class AuthService {
     // const header = new HttpHeaders()
     // header.set('Authorization', `Bearer ${localStorage.getItem('token') || ''}`)
     return this.http.get<loginResponse>(`${this.baseUrl}/verify`, {headers})
+    .pipe(
+      map( resp => {
+        // Guardar la información de usuario
+        return true;
+      }),
+      catchError( err => of(false))
+
+    )
   }
 
   login(email: string, password: string) {
