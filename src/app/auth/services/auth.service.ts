@@ -1,10 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
-import { loginResponse, RegisterResponse, User } from '../../shared/interfaces/auth';
+import { loginResponse, RegisterResponse, Token, User } from '../../shared/interfaces/auth';
 import { ContactsService } from '../../contacts/services/contacts.service';
 import { Router } from '@angular/router';
 import {jwtDecode} from 'jwt-decode';
+import { ValidationErrors } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
@@ -24,9 +25,10 @@ export class AuthService {
       this._userId = userId;
       this.isLoggedSignal.set(true);
     }
+    this.validateToken().subscribe(resp=> console.log(resp))
   }
 
-  getDecodedAccessToken(token: string): any {
+  getDecodedAccessToken(token: string): Token | null {
     try {
       return jwtDecode(token);
     } catch(Error) {
@@ -48,6 +50,14 @@ export class AuthService {
     }
   }
 
+  validateToken(){
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${localStorage.getItem('token') || ''}`) 
+    // ESTO NO ES EQUIVALENTE YA QUE SET DEVUELVE UNA CABECERA NUEVA NO MODIFICA 
+    // const header = new HttpHeaders()
+    // header.set('Authorization', `Bearer ${localStorage.getItem('token') || ''}`)
+    return this.http.get<loginResponse>(`${this.baseUrl}/verify`, {headers})
+  }
+
   login(email: string, password: string) {
     console.log('Email: ', email, 'Password: ', password)
     return this.http.post<loginResponse>(`${this.baseUrl}/login`, { email, password })
@@ -55,11 +65,12 @@ export class AuthService {
         tap({
           next: response => {
             const token = this.getDecodedAccessToken(response.token);
-            console.log('Token:' , token)
-            this._userId = token.userId;
-            localStorage.setItem('userId', token.userId)
-            localStorage.setItem('token', response.token);
-            this.isLoggedSignal.set(true);
+            if (token) {
+              this._userId = token.userId;
+              localStorage.setItem('userId', token.userId)
+              localStorage.setItem('token', response.token);
+              this.isLoggedSignal.set(true);
+            }
           }
         })
       )
